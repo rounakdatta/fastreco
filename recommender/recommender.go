@@ -220,8 +220,8 @@ func (recommender *ItemItemCollaborativeFiltering) FitRecommendations(likedData 
 	})
 }
 
-func (recommender *ItemItemCollaborativeFiltering) Recommend(recommendationData qframe.QFrame, itemId int, outputCount int) []int {
+func (recommender *ItemItemCollaborativeFiltering) Recommend(recommendationData qframe.QFrame, itemId int, outputCount int) []float64 {
 	return recommendationData.Filter(
 		qframe.Filter{Column: "item", Comparator: "=", Arg: itemId},
-		).Sort(qframe.Order{Column: "score", Reverse: false}).MustIntView("recommended_item").Slice()[:outputCount]
+		).Sort(qframe.Order{Column: "score", Reverse: false}).MustFloatView("recommended_item").Slice()[:outputCount]
 }
