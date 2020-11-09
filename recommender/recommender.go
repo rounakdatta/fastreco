@@ -13,7 +13,7 @@ type ItemItemCollaborativeFiltering struct {
 }
 
 type ItemLiking struct {
-	LikedColumn string
+	LikedColumn    string
 	LikedThreshold int
 }
 
@@ -23,7 +23,7 @@ type itemPair struct {
 }
 
 type itemPairCommonUsers struct {
-	Pair itemPair
+	Pair          itemPair
 	UsersInCommon int
 }
 
@@ -170,14 +170,14 @@ func (recommender *ItemItemCollaborativeFiltering) getItemPairExpectedCommonUser
 
 	var expectedCommonUsersCount float64 = 0
 	for _, userInteractionCount := range allOtherItemsUserLiked {
-		expectedCommonUsersCount += 1 - math.Pow(1 - secondItemLikingProbability, float64(userInteractionCount))
+		expectedCommonUsersCount += 1 - math.Pow(1-secondItemLikingProbability, float64(userInteractionCount))
 	}
 
 	return expectedCommonUsersCount
 }
 
 func (recommender *ItemItemCollaborativeFiltering) getRecommendationScore(expectedUserMetric float64, actualUserMetric float64) float64 {
-	return (actualUserMetric - expectedUserMetric) * math.Log(actualUserMetric + 0.1) / math.Sqrt(expectedUserMetric)
+	return (actualUserMetric - expectedUserMetric) * math.Log(actualUserMetric+0.1) / math.Sqrt(expectedUserMetric)
 }
 
 func (recommender *ItemItemCollaborativeFiltering) FitRecommendations(likedData qframe.QFrame, itemId int) qframe.QFrame {
@@ -217,17 +217,17 @@ func (recommender *ItemItemCollaborativeFiltering) FitRecommendations(likedData 
 	}
 
 	return qframe.New(map[string]interface{}{
-		"item": itemPairsCommon_Pair_Given,
-		"recommended_item": itemPairsCommon_Pair_Recommending,
-		"common_users_count": itemPairsCommon_UsersInCommon,
+		"item":                  itemPairsCommon_Pair_Given,
+		"recommended_item":      itemPairsCommon_Pair_Recommending,
+		"common_users_count":    itemPairsCommon_UsersInCommon,
 		"expected_common_users": itemPairExpectedLikingProbability,
-		"score": itemPairScores,
+		"score":                 itemPairScores,
 	})
 }
 
 func (recommender *ItemItemCollaborativeFiltering) Recommend(recommendationData qframe.QFrame, itemId int, outputCount int) []float64 {
 	return recommendationData.Filter(
 		qframe.Filter{Column: "item", Comparator: "=", Arg: float64(itemId)},
-		).Sort(qframe.Order{Column: "score", Reverse: false}).Apply(
+	).Sort(qframe.Order{Column: "score", Reverse: false}).Apply(
 		qframe.Instruction{Fn: function.FloatI, DstCol: "recommended_item", SrcCol1: "recommended_item"}).MustFloatView("recommended_item").Slice()[:outputCount]
 }

@@ -56,7 +56,10 @@ func WriteNewStatus(itemIds []int) {
 		os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
 		createStatus()
-		return
+
+		fileWriter, err = os.OpenFile(util.StatusFilename,
+			os.O_APPEND|os.O_WRONLY, 0644)
+		util.Check(err)
 	}
 
 	var newStatus = ""

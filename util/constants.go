@@ -1,7 +1,7 @@
 package util
 
 const (
-	appName = "fastreco"
-	StatusFilename = appName + ".status"
+	appName          = "fastreco"
+	StatusFilename   = appName + ".status"
 	StatusColumnName = "column"
 )
