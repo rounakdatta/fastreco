@@ -27,6 +27,7 @@ func WriteDataframeToJson(payload qframe.QFrame, fileName string) {
 	fileWriter, err := os.Create(fileName)
 	util.Check(err)
 
+	defer fileWriter.Close()
 	writeErr := payload.ToJSON(fileWriter)
 	util.Check(writeErr)
 }

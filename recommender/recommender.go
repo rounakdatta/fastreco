@@ -12,6 +12,11 @@ type ItemItemCollaborativeFiltering struct {
 	ItemColumn string
 }
 
+type ItemLiking struct {
+	LikedColumn string
+	LikedThreshold int
+}
+
 type itemPair struct {
 	First  int
 	Second int
@@ -22,9 +27,9 @@ type itemPairCommonUsers struct {
 	UsersInCommon int
 }
 
-func (recommender *ItemItemCollaborativeFiltering) GetLikedData(originalData qframe.QFrame) qframe.QFrame {
+func (recommender *ItemItemCollaborativeFiltering) GetLikedData(originalData qframe.QFrame, likedMetric ItemLiking) qframe.QFrame {
 	return originalData.Filter(
-		qframe.Filter{Column: "rating", Comparator: ">=", Arg: 5},
+		qframe.Filter{Column: likedMetric.LikedColumn, Comparator: ">=", Arg: likedMetric.LikedThreshold},
 	).Select(recommender.UserColumn, recommender.ItemColumn)
 }
 
@@ -222,6 +227,7 @@ func (recommender *ItemItemCollaborativeFiltering) FitRecommendations(likedData 
 
 func (recommender *ItemItemCollaborativeFiltering) Recommend(recommendationData qframe.QFrame, itemId int, outputCount int) []float64 {
 	return recommendationData.Filter(
-		qframe.Filter{Column: "item", Comparator: "=", Arg: itemId},
-		).Sort(qframe.Order{Column: "score", Reverse: false}).MustFloatView("recommended_item").Slice()[:outputCount]
+		qframe.Filter{Column: "item", Comparator: "=", Arg: float64(itemId)},
+		).Sort(qframe.Order{Column: "score", Reverse: false}).Apply(
+		qframe.Instruction{Fn: function.FloatI, DstCol: "recommended_item", SrcCol1: "recommended_item"}).MustFloatView("recommended_item").Slice()[:outputCount]
 }
